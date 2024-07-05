@@ -7,7 +7,7 @@ import numpy as np
 #
 import sys
 from PyQt5.QtWidgets import QApplication
-from MainWindow import MainWindow
+from src.MainWindow import MainWindow
 
 def main():
     app = QApplication(sys.argv)

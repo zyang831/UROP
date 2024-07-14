@@ -1,6 +1,7 @@
 import sys
 import os
 import tempfile
+import webbrowser
 
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QLabel, QVBoxLayout, QWidget, QStyleFactory
@@ -79,6 +80,7 @@ class MainWindow(QMainWindow):
             self.reset_button.clicked.connect(self.reset_plot) 
             self.coordinates_label = QLabel("No coordinates loaded.")
             self.measurement_label = QLabel("No measurements taken.")
+            self.generate_map_button = QPushButton("Generate Map")
 
             layout = QVBoxLayout()
             layout.addWidget(self.canvas)
@@ -88,10 +90,32 @@ class MainWindow(QMainWindow):
             layout.addWidget(self.reset_button) 
             layout.addWidget(self.coordinates_label)
             layout.addWidget(self.measurement_label)
+            layout.addWidget(self.generate_map_button)
 
             container = QWidget()
             container.setLayout(layout)
             self.setCentralWidget(container)
+            self.generate_map_button.clicked.connect(self.generate_map)
+
+    def generate_map(self):
+        """Generates an interactive map with the loaded coordinates and saves it as an HTML file."""
+        if not self.latitudes or not self.longitudes:
+            self.coordinates_label.setText("No coordinates available to generate map.")
+            return
+
+        # Create a map centered around the first coordinate
+        map_center = [self.latitudes[0], self.longitudes[0]]
+        flight_map = folium.Map(location=map_center, zoom_start=10)
+
+        # Add markers for each coordinate
+        for lat, lon in zip(self.latitudes, self.longitudes):
+            folium.Marker(location=[lat, lon]).add_to(flight_map)
+
+        # Save the map to an HTML file
+        map_file = "flight_map.html"
+        flight_map.save(map_file)
+        self.coordinates_label.setText(f"Map generated and saved to {map_file}")
+        webbrowser.open(map_file)
 
     def on_click(self, event):
             """Handles click events on the canvas, snapping to close existing points.

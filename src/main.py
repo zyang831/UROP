@@ -105,11 +105,16 @@ class MainWindow(QMainWindow):
 
         # Create a map centered around the first coordinate
         map_center = [self.latitudes[0], self.longitudes[0]]
-        flight_map = folium.Map(location=map_center, zoom_start=10)
+        flight_map = folium.Map(location=map_center, zoom_start=100)
 
-        # Add markers for each coordinate
-        for lat, lon in zip(self.latitudes, self.longitudes):
-            folium.Marker(location=[lat, lon]).add_to(flight_map)
+        # Add a marker for the starting point
+        folium.Marker(location=map_center, popup="Starting Point").add_to(flight_map)
+
+        # Create a list of coordinate pairs
+        coordinates = list(zip(self.latitudes, self.longitudes))
+
+        # Add a PolyLine to trace the flight path
+        folium.PolyLine(locations=coordinates, color="blue", weight=2.5, opacity=1).add_to(flight_map)
 
         # Save the map to an HTML file
         map_file = "flight_map.html"
